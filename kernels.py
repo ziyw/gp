@@ -2,10 +2,10 @@ import numpy as np
 
 class Kernel:
 
-	def __init__(self,T):
+	def __init__(self,time):
 		# T time points
-		self.T = np.array(X, dtype = 'float64') 
-		N = T.size 
+		self.time = np.array(time, dtype = 'float64') 
+		N = time.size 
 		self.K = np.zeros((N,N))
 
 	def SE(self,h,l):
@@ -17,7 +17,7 @@ class Kernel:
 			h^2( exp [- ((x_i - x_j) / l)^2 ]) 
 		'''
 		self.type = "SE"
-		X = self.T
+		X = self.time
 
 		R = (X.T - X)/ l
 		R = np.power(R, 2)
@@ -41,7 +41,7 @@ class Kernel:
 		self.alpha = alpha 
 		self.l = l
 
-		X = self.T
+		X = self.time
 		R = np.power(X.T - X,2)
 		R = R / (alpha * l * l)
 		R = h*h * (R + 1)
@@ -58,7 +58,7 @@ class Kernel:
 		output :
 			sigma ^ 2 x delta(i,j)
 		"""	
-		X = self.T
+		X = self.time
 		self.sigma = sigma
 		K = np.identity(N)
 		K = K * sigma * sigma 
@@ -67,7 +67,7 @@ class Kernel:
 
 	def per_SE(self, h,w,l):
 
-		X = self.T
+		X = self.time
 		R = np.pi * np.abs((X.T - X)/ l)
 		R = np.sin(R)
 		R = (1. / (2 * w * w)) * np.power(R, 2)
@@ -80,8 +80,10 @@ class Kernel:
 
 if __name__ == '__main__':
 
-	X = np.array([1,2,3,4]).reshape(-1,1)
-	k = Kernel(X)
+	time = np.array([1,2,3,4]).reshape(-1,1)
+	k = Kernel(time)
 	k.per_SE(1,2,3)
+	#k.SE(1,2)
+	#k.RQ(1,2,3)
 
 	print k.K 
