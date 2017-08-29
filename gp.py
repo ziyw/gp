@@ -3,6 +3,7 @@
 import numpy as np 
 import scipy 
 import kernels
+from matplotlib import pyplot as plt
 
 from scipy.linalg import solve
 from scipy.spatial.distance import pdist, squareform,euclidean
@@ -35,6 +36,11 @@ class GP:
 			arg = list(arguments)
 			h,alpha,l = arg[0],arg[1],arg[2]
 			K_all = self.kernel.RQ(h,alpha,l)
+
+		if kernel_type == "per_SE":
+			arg = list(arguments)
+			h,w,l = arg[0],arg[1],arg[2]
+			K_all = self.kernel.per_SE(h,w,l)
 
 		N = self.N
 
@@ -72,15 +78,10 @@ class GP:
 
 		return mean, var, p
 
+	def classfication():
+		pass 
 
 if __name__ == '__main__':
 
-	# X = np.linspace(0.05,0.95,10)[:,None]
-	X = np.array([1,2,3,4])
-	y = np.sin(X)
+	# input data for GP 
 	
-	x_test = np.matrix([5])
-
-	gp = GP(X,y)
-	print gp.regression(x_test,"RQ", 4,5,6)
-
