@@ -25,6 +25,7 @@ class Kernel:
 		K = h*h * np.exp(-R)
 
 		self.K = K
+		return K
 
 	def RQ(self, h, alpha, l):
 		"""
@@ -48,6 +49,7 @@ class Kernel:
 		K = np.power(R, -alpha)
 
 		self.K = K
+		return K
 
 	def white_noise(self,sigma):
 		"""
