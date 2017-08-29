@@ -25,9 +25,9 @@ class GP:
 		self.kernel = kernels.Kernel(X_all, X.size + x_test.size)
 		
 		if kernel_type == "SE":
-		
-			h,l = list(arguments)[0],list(arguments)[1]
 
+			arg = list(arguments)
+			h,l = arg[0],arg[1]
 			# K matrix contains K(x,x), K (x*,x) and K(x*,x*)
 			K_all = self.kernel.SE(h,l)
 		

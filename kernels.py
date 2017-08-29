@@ -2,10 +2,10 @@ import numpy as np
 
 class Kernel:
 
-	def __init__(self,X,N):
-		# X is a array of scaler 
-		self.X = np.array(X, dtype = 'float64') 
-		self.N = N
+	def __init__(self,T):
+		# T time points
+		self.T = np.array(X, dtype = 'float64') 
+		N = T.size 
 		self.K = np.zeros((N,N))
 
 	def SE(self,h,l):
@@ -17,13 +17,13 @@ class Kernel:
 			h^2( exp [- ((x_i - x_j) / l)^2 ]) 
 		'''
 		self.type = "SE"
-		X = self.X
+		X = self.T
 
 		R = (X.T - X)/ l
 		R = np.power(R, 2)
-
-		K = h*h * np.exp(-R)
-
+		
+		K = np.power(h,2) * np.exp(-R)
+		
 		self.K = K
 		return K
 
@@ -41,7 +41,7 @@ class Kernel:
 		self.alpha = alpha 
 		self.l = l
 
-		X = self.X
+		X = self.T
 		R = np.power(X.T - X,2)
 		R = R / (alpha * l * l)
 		R = h*h * (R + 1)
@@ -58,10 +58,21 @@ class Kernel:
 		output :
 			sigma ^ 2 x delta(i,j)
 		"""	
-		X = self.X
+		X = self.T
 		self.sigma = sigma
 		K = np.identity(N)
 		K = K * sigma * sigma 
+
+		return K
+
+	def per_SE(self, h,w,l):
+
+		X = self.T
+		R = np.pi * np.abs((X.T - X)/ l)
+		R = np.sin(R)
+		R = (1. / (2 * w * w)) * np.power(R, 2)
+		K = np.power(h,2) * np.exp(-R)
+		self.K = K
 
 		return K
 
@@ -70,7 +81,7 @@ class Kernel:
 if __name__ == '__main__':
 
 	X = np.array([1,2,3,4]).reshape(-1,1)
-	k = Kernel(X,4)
-	k.RQ(1,2,3)
+	k = Kernel(X)
+	k.per_SE(1,2,3)
 
 	print k.K 
