@@ -95,13 +95,17 @@ class GP:
 	# def classfication():
 	# 	pass 
 
+if __name__ == '__main__':
 
-ker = Kernel.SE(1,1)
+	# format to use GP
+	ker = Kernel()
+	ker.SE(1,1)
 
-# time points, values, kernels
-# kernels are objects 
-k = kernels.SE(set_parameters)
-GP.GPR(t = t, v = v, prediction = a,kernel = k)
-# it will return mean of the new point, covariance of the new point
-# and the posterior of the new point 
+	t = np.array([1,2,3,4])
+	v = np.sin(t)
+
+	predict_points = np.array([5,6,7])
+	gp = GP()
+	gp.GPR(time_points = t, values = v,predict_points = predict_points, kernel = ker)
+
 
