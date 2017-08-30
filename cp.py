@@ -28,30 +28,48 @@ value = np.sin(time) + np.random.normal(0,1,30)
 
 # set the style of the plot
 
-axis_x = np.arange(0,5.1,0.1)
-fig = plt.figure(0)
+def plot_results(time_points, values):
 
-plt.axis([0,5,-2,2], facecolor = 'g')
-plt.grid(color='w', linestyle='-', linewidth=0.5)
+	axis_x = np.arange(0,5.1,0.1)
+	fig = plt.figure(0)
+
+	plt.axis([0,5,-2,2], facecolor = 'g')
+	plt.grid(color='w', linestyle='-', linewidth=0.5)
+
+	ax = fig.add_subplot(111)
+	ax.spines['top'].set_visible(False)
+	ax.spines['right'].set_visible(False)
+	ax.patch.set_facecolor('#E8E8F1')
 
 
 
-ax = fig.add_subplot(111)
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.patch.set_facecolor('#E8E8F1')
 
-# show covariance 
-plt.fill_between(axis_x,-1,1,color = '#D1D9F0')
+	# show mean 
+	mu = np.zeros(axis_x.size)
+	var = np.zeros(axis_x.size)
 
-# show the points
-plt.scatter(time, value,color = '#598BEB')
+	ker = Kernel()
+	ker.SE(1,1)
 
-# show mean 
-mu = np.zeros(axis_x.size)
-plt.plot(axis_x, mu, linewidth = 2, color = "#5B8CEB")
+	gp = GP()
 
-plt.show()
+	for i in range(axis_x.size):
+		mu[i],var[i],_ = gp.GPR(time_points = time_points,values = values, predict_point = axis_x[i], kernel = ker)
+
+	# show covariance 
+
+	print mu
+	plt.fill_between(axis_x,mu + var,mu-var,color = '#D1D9F0')
+
+	# show mean 
+	plt.plot(axis_x, mu, linewidth = 2, color = "#5B8CEB")
+
+	# show the points
+	plt.scatter(time, value,color = '#598BEB')
+	
+	plt.show()
+
+plot_results(time, value)
 
 # 	# X = np.linspace(0.05,0.95,10)[:,None]
 # 	t = np.array([1,2,3,4])
