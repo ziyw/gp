@@ -5,12 +5,14 @@ class Kernel:
 	def SE(self,output_scale,input_scale):
 		self.output_scale = output_scale
 		self.input_scale = input_scale
+		self.type = 'SE'
 
 	def cal_SE(self,X):
 		'''
 		Calculate SE covariance matrix
 		Including K(x,x*), and K(x*,x*)
 		'''
+		X = X * 1.
 		h = self.output_scale
 		l = self.input_scale
 

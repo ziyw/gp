@@ -10,11 +10,8 @@ from scipy.spatial.distance import pdist, squareform,euclidean
 
 class GP:
 
-
 	def GPR(self, time_points, values, predict_point, kernel, noise_level = 1):
-		'''
-		One point at a time 
-		'''
+
 		X = np.append(time_points, predict_point).reshape(-1,1)
 		N = time_points.size
 
@@ -56,6 +53,6 @@ if __name__ == '__main__':
 
 	predict_points = np.array([5])
 	gp = GP()
-	print gp.GPR(time_points = t, values = v,predict_point = predict_points, kernel = ker)
+	print gp.GPR(time_points = t,values = v, predict_point = predict_points, kernel = ker)
 
 

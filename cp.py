@@ -4,32 +4,52 @@ Compare the two with plot
 '''
 import numpy as np
 import GPy
-
-k = GPy.kern.RBF(1,1,1)
-X = np.array([1,2,3,4]).reshape(-1,1)
-mu = np.zeros((500))
-C = k.K(X,X)
-print C
-
-from kernels import Kernel 
+from kernels import Kernel
 from gp import GP
-
-k = Kernel(X)
-k.SE(1,np.sqrt(2))
-print k.K
-
-# the kernel function is  the same 
+from matplotlib import pyplot as plt
 
 
+
+# k = GPy.kern.RBF(1,1,1)
+# X = np.array([1,2,3,4]).reshape(-1,1)
+# mu = np.zeros((500))
+# C = k.K(X,X)
+# print C
+
+# k = Kernel(X)
+# k.SE(1,np.sqrt(2))
+# print k.K
+
+# # the kernel function is  the same 
+
+# input Data points
 time = np.random.random(30)*5
 value = np.sin(time) + np.random.normal(0,1,30)
 
-# plot the result 
+# set the style of the plot
+
 axis_x = np.arange(0,5.1,0.1)
-plt.figure(0)
-plt.axis([0,5,-2,2])
-plt.fill_between(axis_x,-1,1)
-plt.scatter(time, value,color = 'r')
+fig = plt.figure(0)
+
+plt.axis([0,5,-2,2], facecolor = 'g')
+plt.grid(color='w', linestyle='-', linewidth=0.5)
+
+
+
+ax = fig.add_subplot(111)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.patch.set_facecolor('#E8E8F1')
+
+# show covariance 
+plt.fill_between(axis_x,-1,1,color = '#D1D9F0')
+
+# show the points
+plt.scatter(time, value,color = '#598BEB')
+
+# show mean 
+mu = np.zeros(axis_x.size)
+plt.plot(axis_x, mu, linewidth = 2, color = "#5B8CEB")
 
 plt.show()
 
