@@ -2,22 +2,26 @@ import numpy as np
 
 class Kernel:
 
-	def __init__(self,time):
-		# T time points
-		self.time = np.array(time, dtype = 'float64') 
-		N = time.size 
-		self.K = np.zeros((N,N))
+	@classmethod
+	def SE(cls,output_scale,input_scale):
+		'''
+		parameters for 
+		'''
+		Kernel.type = 'SE'
+		Kernel.output_scale = output_scale
+		Kernel.input_scale = input_scale
+		#self.type = "SE"
 
-	def SE(self,h,l):
+		#self.output_scale = output_scale
+	
+	@classmethod
+	def cal_SE(cls,X):
 		'''
-		input arguments:
-			h: output-scale amplitude 
-			l: input scale 
-		output: 
-			h^2( exp [- ((x_i - x_j) / l)^2 ]) 
+		Calculate SE covariance matrix
+		Including K(x,x*), and K(x*,x*)
 		'''
-		self.type = "SE"
-		X = self.time
+		h = Kernel.output_scale
+		l = Kernel.input_scale
 
 		R = (X.T - X)/ l
 		R = np.power(R, 2)
@@ -27,7 +31,22 @@ class Kernel:
 		self.K = K
 		return K
 
-	def RQ(self, h, alpha, l):
+		pass 
+
+	def RQ(self, output_scale, input_scale, index):
+		pass 
+
+	def cal_RQ(self,X):
+		pass 
+
+	def per_SE(self, output_scale, time_period, length_scale):
+		pass 
+
+	def cal_per_SE(self,X):
+		pass 
+
+
+	#def RQ(self, h, alpha, l):
 		"""
 		Rational quadratic 
 		input arguments:
@@ -51,21 +70,7 @@ class Kernel:
 		self.K = K
 		return K
 
-	def white_noise(self,sigma):
-		"""
-		input arguments:
-			sigma: white noise parameter
-		output :
-			sigma ^ 2 x delta(i,j)
-		"""	
-		X = self.time
-		self.sigma = sigma
-		K = np.identity(N)
-		K = K * sigma * sigma 
-
-		return K
-
-	def per_SE(self, h,w,l):
+	##def per_SE(self, h,w,l):
 
 		X = self.time
 		R = np.pi * np.abs((X.T - X)/ l)
@@ -76,14 +81,9 @@ class Kernel:
 
 		return K
 
+# ker = Kernel.SE(1,1)
 
 
 if __name__ == '__main__':
-
-	time = np.array([1,2,3,4]).reshape(-1,1)
-	k = Kernel(time)
-	k.per_SE(1,2,3)
-	#k.SE(1,2)
-	#k.RQ(1,2,3)
-
-	print k.K 
+	ker = Kernel.SE(1,1)
+	print ker.cal_SE([1,2,3,4])
