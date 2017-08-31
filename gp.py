@@ -20,19 +20,19 @@ class GP:
 		self.N = time_points.size # number of time points 
 
 		self.mean = mean 
-		self.kernel = kernel
+		self.kers = []
+		self.kers.append(kernel)
+
 
 		if kernel.type == "SE":
 			kernel.cal_SE(time_points.reshape(-1,1))
 		
+		self.num_kernel = len(self.kers)
+
 
 	def get_likelihood(self, time_point, value):
 		return self.GPR(time_point, value, self.kernel)
 		
-
-	def add_kernels(self,new_kernel):
-		# Adding more kernels to the GP project 
-		pass
 	def plot(self):
 		'''
 		Plot the Gaussian Process object itself
@@ -52,8 +52,6 @@ class GP:
 		ax = fig.add_subplot(111)
 		ax.spines['top'].set_visible(False)
 		ax.spines['right'].set_visible(False)
-
-		
 
 		# show mean 
 		mu = np.zeros(axis_x.size)
@@ -88,29 +86,39 @@ class GP:
 
 		pass
 
-
-	def GPR_multi_kernels():
-		# GPR with multiple kernels adding up together
-		pass 
-	def add_kernel(self, kernel):
-		pass 
-
 	def GPR(self,predict_point,kernel, noise_level = 1):
-		# how to adding kernels together?
 		
+		if self.num_kernel == 1:
+			K = self.kers[0].K
+			cov_K = K
+			ker = self.kers[0]
+			cov_k_K,cov_k = ker.cal_new_SE(self.time_points, predict_point)
+		
+		else :
+
+			K = self.kers[0].K
+			ker = self.kers[0]
+			cov_k_K,cov_k = ker.cal_new_SE(self.time_points, predict_point)
+
+			for i in range(1,self.num_kernel):
+				K += self.kers[i].K
+				ker = self.kers[i]
+				k1,k2 = ker.cal_new_SE(self.time_points, predict_point)
+				cov_k_K += k1
+				cov_k += k2
+		
+		cov_K = K
+
 		time_points = self.time_points
 		values = self.values
 
-		X = np.append(time_points, predict_point).reshape(-1,1)
 		N = time_points.size
-		K = kernel.K
-
-		cov_K = K
-
-		cov_k_K,cov_k = kernel.cal_new_SE(self.time_points, predict_point)
 
 		# need to add the noise level later
+		# noise level is another kernel adding up 
+		# so s actually could be removed 
 		s = noise_level 
+
 		A = cov_K + np.identity(N) * s * s
 		
 		# calculate L 
@@ -129,6 +137,20 @@ class GP:
 
 		return mean, var, p 
 
+	def add_kernel(self, new_kernel):
+		self.kers.append(new_kernel)
+
+		if new_kernel.type == "SE":
+			new_kernel.cal_SE(self.time_points.reshape(-1,1))
+		
+		self.num_kernel = len(self.kers)
+		pass
+
+	def set_kernels(self, new_kernels):
+		'''
+		Set all kernels to a new set 
+		'''
+		pass
 if __name__ == '__main__':
 
 	# format to use GP
@@ -140,5 +162,11 @@ if __name__ == '__main__':
 	predict_points = np.array([5])
 	
 	gp = GP(time_points = t, values = v, kernel = ker, mean = 0)
-	print gp.GPR(predict_point = predict_points,kernel = ker, noise_level = 1)
 	gp.plot()
+	print gp.GPR(predict_point = predict_points,kernel = ker, noise_level = 1)
+	
+	k2 = Kernel("SE",2,3)
+	gp.add_kernel(k2)
+
+	print gp.GPR(predict_point = predict_points,kernel = ker, noise_level = 1)
+	# gp.plot()
