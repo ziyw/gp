@@ -43,13 +43,17 @@ class GP:
 		axis_x = np.arange(range_min-1,range_max+1,0.1)
 		fig = plt.figure(0)
 
-		#plt.axis([0,5,-2,2], facecolor = 'g')
-		plt.grid(color='w', linestyle='-', linewidth=0.5)
 
+		# background color
+		#plt.axis([0,5,-2,2], facecolor = 'g')
+		# plt.grid(color='w', linestyle='-', linewidth=0.5)
+		# ax.patch.set_facecolor('#E8E8F1')
+		
 		ax = fig.add_subplot(111)
 		ax.spines['top'].set_visible(False)
 		ax.spines['right'].set_visible(False)
-		ax.patch.set_facecolor('#E8E8F1')
+
+		
 
 		# show mean 
 		mu = np.zeros(axis_x.size)
@@ -62,6 +66,8 @@ class GP:
 		
 		# show mean 
 		plt.plot(axis_x, mu, linewidth = 2, color = "#5B8CEB")
+		plt.xlabel('Time points')
+		plt.ylabel('Values')
 		# show the points
 		plt.scatter(self.time_points, self.values,color = '#598BEB')
 		plt.show()
