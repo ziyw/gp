@@ -57,7 +57,7 @@ class Kernel:
 		
 		cov_k_K = K[0:-1]
 		cov_k = K[-1]
-		# because it is different for every points, no need to save in the object
+		# because it is different for every point, no need to save in the object
 		return cov_k_K,cov_k
 
 	def RQ(self, output_scale, input_scale, index):
