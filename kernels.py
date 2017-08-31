@@ -39,6 +39,7 @@ class Kernel:
 		K = np.power(h,2) * np.exp(-R)
 		
 		self.K = K
+		print K
 		return K
 
 	def cal_new_SE(self, X, new_point):

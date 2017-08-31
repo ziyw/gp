@@ -8,7 +8,7 @@ from scipy.linalg import solve
 from scipy.spatial.distance import pdist, squareform,euclidean
 from matplotlib import pyplot as plt
 
-# for test, delete latter 
+# for
 import GPy
 
 class GP:
@@ -23,14 +23,20 @@ class GP:
 		self.kernel = kernel
 
 		if kernel.type == "SE":
-			kernel.cal_SE(time_points)
+			kernel.cal_SE(time_points.reshape(-1,1))
 		
 
 	def get_likelihood(self, time_point, value):
 		return self.GPR(time_point, value, self.kernel)
 		
-	def plot(self):
 
+	def add_kernels(self,new_kernel):
+		# Adding more kernels to the GP project 
+		pass
+	def plot(self):
+		'''
+		Plot the Gaussian Process object itself
+		'''
 		range_min = np.min(self.time_points)
 		range_max = np.max(self.time_points)
 
@@ -76,26 +82,24 @@ class GP:
 
 		pass
 
+
+	def GPR_multi_kernels():
+		# GPR with multiple kernels adding up together
+		pass 
+
 	def GPR(self,predict_point,kernel, noise_level = 1):
 		# how to adding kernels together?
 		
 		time_points = self.time_points
 		values = self.values
 
-		print kernel.K
-
 		X = np.append(time_points, predict_point).reshape(-1,1)
 		N = time_points.size
 		K = kernel.K
 
-
-
 		cov_K = K
 
 		cov_k_K,cov_k = kernel.cal_new_SE(self.time_points, predict_point)
-		print cov_k_K 
-		print cov_k
-		print cov_K
 
 		# need to add the noise level later
 		s = noise_level 
