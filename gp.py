@@ -24,14 +24,15 @@ class GP:
 		self.mean = mean 
 		self.kernel = kernel
 
-		# self.var is covariance matrix of time points 
 		if kernel.type == "SE":
-			self.var = kernel.cal_SE(time_points)
+			kernel.cal_SE(time_points)
+
+		print kernel.K
+		
 
 	def get_likelihood(self, time_point, value):
 		return self.GPR(time_point, value, self.kernel)
 		
-
 	def plot(self):
 
 		range_min = np.min(self.time_points)
@@ -69,13 +70,15 @@ class GP:
 		"""
 		pass 
 
-	# def hyper_optimization()
-
-	# init (self, mean, var ... )
-
-	# likelihood(self, time, y) 
-
 	# optimize() auto gradient 
+
+	# a way compare GPs
+	def plot_compare(self,other_GPs):
+		# other_GPs should be a vector of GPs
+		# each one of them should be showed in the plot
+		# mu and scatter should be in different colors 
+
+		pass
 
 	def GPR(self,predict_point,kernel, noise_level = 1):
 		# how to adding kernels together?
@@ -83,15 +86,28 @@ class GP:
 		time_points = self.time_points
 		values = self.values
 
+		print kernel.K
+
 		X = np.append(time_points, predict_point).reshape(-1,1)
 		N = time_points.size
 
 		if kernel.type == 'SE':
 			K = kernel.cal_SE(X)
 
+
+		# cov_K = self.K
+
 		cov_K = K[:N,:N]
 		cov_k_K = K[:N,-1]
 		cov_k = K[-1,-1]
+		print cov_k_K 
+		print cov_k
+		print cov_K
+
+		cov_k_K,cov_k = kernel.cal_new_SE(self.time_points, predict_point)
+		print cov_k_K 
+		print cov_k
+		print cov_K
 
 		# need to add the noise level later
 		s = noise_level 
@@ -117,13 +133,13 @@ class GP:
 if __name__ == '__main__':
 
 	# format to use GP
-	ker = Kernel("SE")
-	ker.SE(1,1)
+	ker = Kernel("SE",1,1)
 
 	t = np.array([1,2,3,4])
 	v = np.sin(t)
 
 	predict_points = np.array([5])
+	
 	gp = GP(time_points = t, values = v, kernel = ker, mean = 0)
 	print gp.GPR(predict_point = predict_points,kernel = ker, noise_level = 1)
 	gp.plot()
