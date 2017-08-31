@@ -2,6 +2,26 @@ import numpy as np
 
 class Kernel:
 
+
+	def __init__(self, kernel_type):
+		# Also need to define a better structure for arguments 
+		self.kernel_type = kernel_type 
+		
+		if kernel_type == "SE":
+			self.output_scale = 1
+			self.input_scale = 1
+		
+		if kernel_type == "RQ":
+			self.output_scale = 1
+			self.input_scale = 1
+			self.index = 1
+
+		if kernel_type == "per_SE":
+			self.output_scale = 1
+			self.time_period = 1
+			self.length_scale = 1
+			
+
 	def SE(self,output_scale,input_scale):
 		self.output_scale = output_scale
 		self.input_scale = input_scale
@@ -63,14 +83,13 @@ class Kernel:
 
 if __name__ == '__main__':
 	x = np.array([1,2,3,4]).reshape(-1,1)
-	ker = Kernel()
+	ker = Kernel("SE")
 	
 	ker.SE(1,1)
 	print ker.cal_SE(x)
 
 	ker.RQ(1,2,3)
 	print ker.cal_RQ(x)
-
 
 	ker.per_SE(1,2,3)
 	print ker.cal_per_SE(x)
