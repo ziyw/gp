@@ -12,6 +12,8 @@ from matplotlib import pyplot as plt
 import GPy
 
 class GP:
+
+
 	def __init__(self, time_points, values, kernel, mean = 0):
 		
 		self.time_points = time_points
@@ -29,6 +31,14 @@ class GP:
 		
 		self.num_kernel = len(self.kers)
 
+
+	def test():
+		"""
+		A test function to compare GP with GPY
+		"""
+		pass 
+
+	# optimize() auto gradient 
 
 	def get_likelihood(self, time_point, value):
 		return self.GPR(time_point, value, self.kernel)
@@ -58,7 +68,7 @@ class GP:
 		var = np.zeros(axis_x.size)
 		
 		for i in range(axis_x.size):
-			mu[i],var[i],_ = self.GPR(predict_point = axis_x[i], kernel = ker)
+			mu[i],var[i],_ = self.GPR(predict_point = axis_x[i])
 		
 		plt.fill_between(axis_x,mu + var,mu-var,color = '#D1D9F0')
 		
@@ -70,24 +80,74 @@ class GP:
 		plt.scatter(self.time_points, self.values,color = '#598BEB')
 		plt.show()
 
-	def test():
-		"""
-		A test function to compare GP with GPY
-		"""
-		pass 
-
-	# optimize() auto gradient 
 
 	# a way compare GPs
 	def plot_compare(self,other_GPs):
 		# other_GPs should be a vector of GPs
 		# each one of them should be showed in the plot
 		# mu and scatter should be in different colors 
+		GPs = [self, other_GPs]
+
+		plt.xlabel('Time points')
+		plt.ylabel('Values')
+		mean_color = ["#0E746B",'#7CAB49','#F49331']
+		cov_color = ['#6BC7C1','#E5E672','#E5E672']
+
+		k_color = 3
+
+		# find the max range
+		range_min = np.min(self.time_points)
+		range_max = np.max(self.time_points)
+
+
+		for i in range(len(GPs)):
+			tmin = np.min(GPs[i].time_points)
+			tmax = np.max(GPs[i].time_points)
+			range_min = min(range_min, tmin)
+			range_max = max(range_max, tmax)
+		
+		axis_x = np.arange(range_min-1,range_max+1,0.1)
+		print axis_x
+		fig = plt.figure(0)
+		ax = fig.add_subplot(111)
+		ax.spines['top'].set_visible(False)
+		ax.spines['right'].set_visible(False)
+
+		for i in range(len(GPs)):
+
+			# show mean 
+			mu = np.zeros(axis_x.size)
+			var = np.zeros(axis_x.size)
+			
+			for j in range(axis_x.size):
+				mu[j],var[j],_ = GPs[i].GPR(predict_point = axis_x[j])
+			
+			print mu 
+			print var
+			plt.fill_between(axis_x,mu + var,mu-var,color = cov_color[i % k_color],alpha = 0.5)
+			
+			# show mean 
+			plt.plot(axis_x, mu, linewidth = 2, color = mean_color[i % k_color])
+
+
+		# background color
+		#plt.axis([0,5,-2,2], facecolor = 'g')
+		# plt.grid(color='w', linestyle='-', linewidth=0.5)
+		# ax.patch.set_facecolor('#E8E8F1')
+
+		# show the points
+		for i in range(len(GPs)):
+			plt.scatter(GPs[i].time_points, GPs[i].values,color = mean_color[i % k_color])
+		
+		plt.show()
+
+
 
 		pass
 
-	def GPR(self,predict_point,kernel, noise_level = 1):
-		
+	def GPR(self,predict_point,noise_level = 1):
+
+
 		if self.num_kernel == 1:
 			K = self.kers[0].K
 			cov_K = K
@@ -154,19 +214,16 @@ class GP:
 if __name__ == '__main__':
 
 	# format to use GP
-	ker = Kernel("SE",1,1)
+	k1 = Kernel("SE",1,1)
+	k2 = Kernel("SE",2,3)
 
-	t = np.array([1,2,3,4])
-	v = np.sin(t) + np.random.normal(0,1,4)
+	t1 = np.array([1,2,3,4])
+	t2 = np.array([3,4,5,6])
+	v = np.sin(t1) + np.random.normal(0,1,4)
 
 	predict_points = np.array([5])
-	
-	gp = GP(time_points = t, values = v, kernel = ker, mean = 0)
-	gp.plot()
-	print gp.GPR(predict_point = predict_points,kernel = ker, noise_level = 1)
-	
-	k2 = Kernel("SE",2,3)
-	gp.add_kernel(k2)
 
-	print gp.GPR(predict_point = predict_points,kernel = ker, noise_level = 1)
-	# gp.plot()
+	gp1 = GP(time_points = t1, values = v, kernel = k1, mean = 0)
+	gp2 = GP(time_points = t2, values = v, kernel = k2, mean = 0)
+
+	gp1.plot_compare(gp2)
