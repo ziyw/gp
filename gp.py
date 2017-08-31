@@ -11,8 +11,6 @@ from matplotlib import pyplot as plt
 # for test, delete latter 
 import GPy
 
-
-
 class GP:
 	def __init__(self, time_points, values, kernel, mean = 0):
 		
@@ -26,8 +24,6 @@ class GP:
 
 		if kernel.type == "SE":
 			kernel.cal_SE(time_points)
-
-		print kernel.K
 		
 
 	def get_likelihood(self, time_point, value):
@@ -90,19 +86,11 @@ class GP:
 
 		X = np.append(time_points, predict_point).reshape(-1,1)
 		N = time_points.size
-
-		if kernel.type == 'SE':
-			K = kernel.cal_SE(X)
+		K = kernel.K
 
 
-		# cov_K = self.K
 
-		cov_K = K[:N,:N]
-		cov_k_K = K[:N,-1]
-		cov_k = K[-1,-1]
-		print cov_k_K 
-		print cov_k
-		print cov_K
+		cov_K = K
 
 		cov_k_K,cov_k = kernel.cal_new_SE(self.time_points, predict_point)
 		print cov_k_K 
@@ -127,7 +115,6 @@ class GP:
 		# marginal likelihood 
 		p = - 1.0 / 2.0 * np.dot(y , alpha) - np.sum(np.log(L.diagonal())) - (N/2.0 *  np.log (2 * np.pi))
 
-		self.kernel = K 
 		return mean, var, p 
 
 if __name__ == '__main__':
