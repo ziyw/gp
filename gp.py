@@ -86,6 +86,8 @@ class GP:
 	def GPR_multi_kernels():
 		# GPR with multiple kernels adding up together
 		pass 
+	def add_kernel(self, kernel):
+		pass 
 
 	def GPR(self,predict_point,kernel, noise_level = 1):
 		# how to adding kernels together?
@@ -127,7 +129,7 @@ if __name__ == '__main__':
 	ker = Kernel("SE",1,1)
 
 	t = np.array([1,2,3,4])
-	v = np.sin(t)
+	v = np.sin(t) + np.random.normal(0,1,4)
 
 	predict_points = np.array([5])
 	
