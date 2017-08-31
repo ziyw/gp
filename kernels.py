@@ -45,6 +45,7 @@ class Kernel:
 	def cal_new_SE(self, X, new_point):
 		# return K(k*)  and K(k*,K)
 		X = X * 1.
+		X = np.append(X,new_point)
 		N = X.size
 
 		h = self.output_scale
@@ -54,7 +55,7 @@ class Kernel:
 		R = np.power(R, 2)
 		K = np.power(h,2) * np.exp(-R)
 		
-		cov_k_K = K[0:N]
+		cov_k_K = K[0:-1]
 		cov_k = K[-1]
 		# because it is different for every points, no need to save in the object
 		return cov_k_K,cov_k
