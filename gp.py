@@ -2,10 +2,12 @@
 # GPR 
 import numpy as np 
 import scipy 
+from scipy import optimize
 from kernels import Kernel
 from matplotlib import pyplot as plt
 from scipy.linalg import solve
 from scipy.spatial.distance import pdist, squareform,euclidean
+
 from matplotlib import pyplot as plt
 
 
@@ -32,39 +34,43 @@ class GP:
 	# optimization 
 	##############
 
-	def get_se_cov(x):
-		h = x[0]
-		l = x[1]
+	def get_se_cov(self, x):
+		h = x[0] * 1.
+		l = x[1] * 1.
 
-		# X = self.time_points
-		P = X * 1.
+		X = np.matrix(self.time_points * 1.)
 
-		R = (P.T - P)/l
+		R = (X.T - X)/l
 		R = np.power(R, 2)
 		K = np.power(h,2) * np.exp(-R)
+
 		return K
 
-	def se_function(x):
+	def se_function(self, x):
 
-		variance = x[0]
-		length = x[1]
+		output_scale = x[0]
+		length_scale = x[1]
 		noise_level = x[2]
 
-		K = get_se_cov(x)
-		(N,_)= K.shape
-		C = K + noise_level * noise_level * np.identity(N)
+		X = self.time_points
+		Y = self.values
 
-		L = np.log(np.linalg.det(C))*0.5 + 0.5 * np.dot(np.dot(Y.T, np.linalg.inv(C)), Y) +  N*1. / 2 * np.log(2* np.pi)
+		K = self.get_se_cov(x)
+		(N,_) = K.shape
 
+		C = np.matrix(K + np.power(noise_level, 2) * np.identity(N) )
+
+		L = np.log(np.linalg.det(C))*0.5 + 0.5 * np.dot(np.dot(Y.T, np.linalg.inv(C)), Y) +  N * 1. / 2 * np.log(2* np.pi)
+		
 		return L
 
 	def optimize(self, kernel = 'SE'):
 
-		self.parameters = scipy.optimize.fmin_bfgs(se_function, [1,1,1])
+		self.parameters = scipy.optimize.fmin_bfgs(self.se_function, [1,1,1])
+		print self.parameters
 
 
-
-	def GPR(self,predict_point,noise_level = 0):
+	def GPR(self,predict_point,noise_level = 1):
 
 		if self.num_kernel == 1:
 			K = self.kers[0].K
@@ -247,7 +253,7 @@ class GP:
 
 if __name__ == '__main__':
 	
-	X = np.array([1,2,3,4]).reshape(-1,1)
+	X = np.matrix([1,2,3,4]).reshape(-1,1)
 	Y = np.sin(X) # np.random.randn(20,1)*0.05
 	X = X.reshape(4,)
 	Y = Y.reshape(4,)
