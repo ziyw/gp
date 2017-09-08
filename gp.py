@@ -8,6 +8,7 @@ from scipy.linalg import solve
 from scipy.spatial.distance import pdist, squareform,euclidean
 from matplotlib import pyplot as plt
 
+
 class GP:
 
 	def __init__(self, time_points, values, kernel, mean = 0):
@@ -26,17 +27,130 @@ class GP:
 		
 		self.num_kernel = len(self.kers)
 
-	def optimize(self,time_point, value):
-		'''
-		optimize the function according to the likelihood function?
-		'''
 
-		scipy.optimize.fmin_bfgs(get_likelihood(), [2, 2], fprime=fprime)
-		pass 
+	##############
+	# optimization 
+	##############
 
-	def get_likelihood(self, predict_point):
-		return self.GPR(predict_point)[2]
+	def get_se_cov(x):
+		h = x[0]
+		l = x[1]
+
+		# X = self.time_points
+		P = X * 1.
+
+		R = (P.T - P)/l
+		R = np.power(R, 2)
+		K = np.power(h,2) * np.exp(-R)
+		return K
+
+	def se_function(x):
+
+		variance = x[0]
+		length = x[1]
+		noise_level = x[2]
+
+		K = get_se_cov(x)
+		(N,_)= K.shape
+		C = K + noise_level * noise_level * np.identity(N)
+
+		L = np.log(np.linalg.det(C))*0.5 + 0.5 * np.dot(np.dot(Y.T, np.linalg.inv(C)), Y) +  N*1. / 2 * np.log(2* np.pi)
+
+		return L
+
+	def optimize(self, kernel = 'SE'):
+
+		self.parameters = scipy.optimize.fmin_bfgs(se_function, [1,1,1])
+
+
+
+	def GPR(self,predict_point,noise_level = 0):
+
+		if self.num_kernel == 1:
+			K = self.kers[0].K
+			cov_K = K
+			ker = self.kers[0]
+			cov_k_K,cov_k = ker.cal_new_SE(self.time_points, predict_point)
 		
+		else :
+
+			K = self.kers[0].K
+			ker = self.kers[0]
+			cov_k_K,cov_k = ker.cal_new_SE(self.time_points, predict_point)
+
+			for i in range(1,self.num_kernel):
+				K += self.kers[i].K
+				ker = self.kers[i]
+				k1,k2 = ker.cal_new_SE(self.time_points, predict_point)
+				cov_k_K += k1
+				cov_k += k2
+		
+		cov_K = K
+
+		time_points = self.time_points
+		values = self.values
+
+		N = time_points.size
+
+		# need to add the noise level later
+		# noise level is another kernel adding up 
+		# so s actually could be removed 
+		s = noise_level 
+
+		A = cov_K + np.identity(N) * s * s
+		
+		# calculate L 
+		L = np.linalg.cholesky(A)
+		y = values
+
+		alpha = solve(L.T,solve(L, y)).reshape(-1,1)
+
+		mean = np.matmul(cov_k_K, alpha)
+		v = solve(L, cov_k_K.T)
+
+		var = cov_k - np.matmul(v.T, v)
+
+		# marginal likelihood 
+		# likelihood is wrong
+		p = - 1.0 / 2.0 * np.dot(y , alpha) - np.sum(np.log(L.diagonal())) - (N/2.0 *  np.log (2 * np.pi))
+
+		print p
+		return mean, var, p 
+
+
+
+	###########################
+	# kernel part 
+	##############
+
+	# kernel manipulation 
+	# sum add_kernel 
+	# product product_kernel
+	# def get_kernel(method = ["add", "product"])
+	def add_kernel(self, new_kernel):
+		self.kers.append(new_kernel)
+
+		if new_kernel.type == "SE":
+			new_kernel.cal_SE(self.time_points.reshape(-1,1))
+		
+		self.num_kernel = len(self.kers)
+		pass
+
+	def set_kernels(self, new_kernels):
+		'''
+		Set all kernels to a new set
+
+		'''
+
+
+
+		pass
+
+
+	########
+	# Making plot part 
+	##########
+
 	def plot(self):
 		'''
 		Plot the Gaussian Process object itself
@@ -73,7 +187,6 @@ class GP:
 		plt.scatter(self.time_points, self.values,color = '#598BEB', marker = 'X')
 		plt.show()
 
-	# a way compare GPs
 	def plot_compare(self,other_GPs):
 		# other_GPs should be a vector of GPs
 		# each one of them should be showed in the plot
@@ -131,77 +244,15 @@ class GP:
 		
 		plt.show()
 
-		pass
 
-	def GPR(self,predict_point,noise_level = 0):
+if __name__ == '__main__':
+	
+	X = np.array([1,2,3,4]).reshape(-1,1)
+	Y = np.sin(X) # np.random.randn(20,1)*0.05
+	X = X.reshape(4,)
+	Y = Y.reshape(4,)
 
-		if self.num_kernel == 1:
-			K = self.kers[0].K
-			cov_K = K
-			ker = self.kers[0]
-			cov_k_K,cov_k = ker.cal_new_SE(self.time_points, predict_point)
-		
-		else :
-
-			K = self.kers[0].K
-			ker = self.kers[0]
-			cov_k_K,cov_k = ker.cal_new_SE(self.time_points, predict_point)
-
-			for i in range(1,self.num_kernel):
-				K += self.kers[i].K
-				ker = self.kers[i]
-				k1,k2 = ker.cal_new_SE(self.time_points, predict_point)
-				cov_k_K += k1
-				cov_k += k2
-		
-		cov_K = K
-
-		time_points = self.time_points
-		values = self.values
-
-		N = time_points.size
-
-		# need to add the noise level later
-		# noise level is another kernel adding up 
-		# so s actually could be removed 
-		s = noise_level 
-
-		A = cov_K + np.identity(N) * s * s
-		
-		# calculate L 
-		L = np.linalg.cholesky(A)
-		y = values
-
-		alpha = solve(L.T,solve(L, y)).reshape(-1,1)
-
-		mean = np.matmul(cov_k_K, alpha)
-		v = solve(L, cov_k_K.T)
-
-		var = cov_k - np.matmul(v.T, v)
-
-		# marginal likelihood 
-		# likelihood is wrong
-		p = - 1.0 / 2.0 * np.dot(y , alpha) - np.sum(np.log(L.diagonal())) - (N/2.0 *  np.log (2 * np.pi))
-
-		print p
-		return mean, var, p 
-
-	def add_kernel(self, new_kernel):
-		self.kers.append(new_kernel)
-
-		if new_kernel.type == "SE":
-			new_kernel.cal_SE(self.time_points.reshape(-1,1))
-		
-		self.num_kernel = len(self.kers)
-		pass
-
-	def set_kernels(self, new_kernels):
-		'''
-		Set all kernels to a new set
-
-		'''
-
-
-
-		pass
-
+	k1 = Kernel("SE",np.sqrt(2),1)
+	
+	gp1 = GP(time_points = X.T, values = Y.T, kernel = k1)
+	gp1.optimize()
