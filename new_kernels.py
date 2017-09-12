@@ -11,19 +11,6 @@ class Kernel:
 			self.l = par2 * 1.
 			self.pars = [par1,par2]
 
-
-	def cal_K(self, X):
-		
-		if self.kernel_type == "SE":
-
-			X = np.matrix(X)
-
-			R = (X.T - X)/self.l
-			R = np.power(R,2)
-			K = np.power(self.h,2) * np.exp(-R)
-
-		return K
-
 	@property 
 	def pars(self):
 		return self.pars
@@ -35,3 +22,4 @@ class Kernel:
 			self.h = values[1]
 			self.l = values[2]
 			self.pars = values
+

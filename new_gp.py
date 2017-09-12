@@ -37,7 +37,7 @@ class GP:
 		K = np.zeros((N,N)) * 1.
 
 		for ker in self.kernels:
-			K += ker.cal_K(X)
+			K += self.cal_K(ker)
 
 		return K
 
@@ -58,6 +58,15 @@ class GP:
 
 		return L
 
+	def cal_K(self, kernel):
+		
+		X = np.matrix(self.time_points)
+
+		if kernel.kernel_type == "SE":
+			R = (X.T - X)/kernel.l
+			R = np.power(R,2)
+			K = np.power(kernel.h,2) * np.exp(-R)
+		return K
 
 	def optimization_function(self,parameters):
 
@@ -76,11 +85,14 @@ class GP:
 			par_num = ker.par_num
 			ker.pars = parameters[j:j+par_num]
 			j = j + par_num
-			K += ker.cal_K(X)
+			K += self.cal_K(ker)
 
 		C = K + np.power(noise_level, 2) * np.identity(N)
+
 		L = np.log(np.linalg.det(C))*0.5 + 0.5 * np.dot(np.dot(Y.T, np.linalg.inv(C)), Y) +  N * 1. / 2 * np.log(2* np.pi)
-		return -L
+		print L
+		
+		return L
 		
 	def optimize(self):
 
@@ -94,9 +106,11 @@ if __name__ == '__main__':
 	X = np.array([1,2,3,4])
 	Y = np.sin(X) # np.random.randn(20,1)*0.05
 
-	k1 = Kernel("SE",1,1)
+	k1 = Kernel("SE",4,5)
 	#k2 = Kernel("SE",1,1)
 	
+
 	gp1 = GP(time_points = X, values = Y, kernels =[k1])
 
 	gp1.optimize()
+
