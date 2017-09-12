@@ -37,7 +37,6 @@ class Kernel:
 		R = (X.T - X)/l
 		R = np.power(R, 2)
 		K = np.power(h,2) * np.exp(-R)
-		
 		self.K = K
 		return K
 

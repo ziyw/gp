@@ -1,5 +1,3 @@
-# Gaussian process regression 
-# GPR 
 import numpy as np 
 import scipy 
 from scipy import optimize
@@ -24,6 +22,14 @@ class GP:
 		self.kers = []
 		self.kers.append(kernel)
 
+		# get the covariance matrix 
+		# self.K = 
+
+		# optimize parameters 
+
+		# self.likelihood 
+
+
 		if kernel.type == "SE":
 			kernel.cal_SE(time_points.reshape(-1,1))
 		
@@ -46,8 +52,23 @@ class GP:
 
 		return K
 
+	# get cov should be different according to different 
+	def get_cov(self,pars):
+
+		pass 
+
+	def get_likelihood(self, pars):
+		pass 
+
+	# then optimization should be optimize likeilihood from the covraince you caculated 
+	def optimize(self):
+		self.pars = scipy.optimize.fmin_bfgs(self.se_function, self.pars)
+		# then update the parameters and K caculated from those parameters
+
+
 	def se_function(self, x):
 
+		print x
 		output_scale = x[0]
 		length_scale = x[1]
 		noise_level = x[2]
@@ -61,13 +82,16 @@ class GP:
 		C = np.matrix(K + np.power(noise_level, 2) * np.identity(N) )
 
 		L = np.log(np.linalg.det(C))*0.5 + 0.5 * np.dot(np.dot(Y.T, np.linalg.inv(C)), Y) +  N * 1. / 2 * np.log(2* np.pi)
-		
+
 		return L
 
 	def optimize(self, kernel = 'SE'):
 
-		self.parameters = scipy.optimize.fmin_bfgs(self.se_function, [1,1,1])
-		print self.parameters
+		# self.parameters = 
+		print scipy.optimize.fmin_bfgs(self.se_function, [1,1,1])
+		# print self.parameters
+
+
 
 
 	def GPR(self,predict_point,noise_level = 1):
@@ -153,7 +177,7 @@ class GP:
 		pass
 
 
-	########
+	######
 	# Making plot part 
 	##########
 
