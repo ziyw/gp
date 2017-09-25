@@ -41,9 +41,6 @@ def plot_results(time_points, values):
 	ax.spines['right'].set_visible(False)
 	ax.patch.set_facecolor('#E8E8F1')
 
-
-
-
 	# show mean 
 	mu = np.zeros(axis_x.size)
 	var = np.zeros(axis_x.size)

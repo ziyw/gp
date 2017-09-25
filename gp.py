@@ -5,9 +5,9 @@ from kernels import Kernel
 from matplotlib import pyplot as plt
 from scipy.linalg import solve
 from scipy.spatial.distance import pdist, squareform,euclidean
+import GPy
 
 from matplotlib import pyplot as plt
-
 
 class GP:
 
@@ -46,8 +46,8 @@ class GP:
 
 		X = np.matrix(self.time_points * 1.)
 
-		R = (X.T - X)/l
-		R = np.power(R, 2)
+		R = (X.T - X)/(l)
+		R = np.power(R, 2) * 0.5
 		K = np.power(h,2) * np.exp(-R)
 
 		return K
@@ -77,6 +77,9 @@ class GP:
 		Y = self.values
 
 		K = self.get_se_cov(x)
+
+		print K
+		
 		(N,_) = K.shape
 
 		C = np.matrix(K + np.power(noise_level, 2) * np.identity(N) )
@@ -87,8 +90,8 @@ class GP:
 
 	def optimize(self, kernel = 'SE'):
 
-		# self.parameters = 
-		print scipy.optimize.fmin_bfgs(self.se_function, [1,1,1])
+		print scipy.optimize.fmin_bfgs(self.se_function, [0.697774447341, 1.61119536129, 7.64794567566e-09])
+
 		# print self.parameters
 
 
@@ -286,3 +289,8 @@ if __name__ == '__main__':
 	
 	gp1 = GP(time_points = X.T, values = Y.T, kernel = k1)
 	gp1.optimize()
+
+	print gp1.se_function([0.697774447341, 1.61119536129, 7.64794567566e-09])
+
+
+	#print k1.cal_SE()

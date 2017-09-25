@@ -1,0 +1,17 @@
+- What is the objective function for GP
+- Marginal likelihood (how to get the optimize of the parameters)
+
+- No need to add the white noise kernel in the rbf regression
+because we could add another kernel to the rbf regression model 
+
+- Add white noise kernel
+
+- replace the set_kernels with "="
+
+- Get GPy return marginal likelihood
+
+- Bayesian optimization with GP is more like to use GP to solve bayesian optimization problem rather than to optimize parameters for GP 
+
+- Keep the calculation of Kernel in the GP part? or still make in the Kernel object? if keep it in the kernel, could we optimize it?
+
+- Make the structure of the repo better, according to Hitchhack's guide to python
