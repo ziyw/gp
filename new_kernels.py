@@ -7,15 +7,8 @@ class Kernel:
 		
 		if kernel_type == 'SE':
 			self.par_num = 2
-			self._pars = list(pars)
+			self.pars = pars
 
-	@property 
-	def pars(self):
-		return self._pars
-	
-	@pars.setter
-	def pars(self, values):
-		if self.kernel_type == 'SE':
-			print "Set new value to kernels"
-			self._pars = list(values)
-
+	def display(self):
+		print self.kernel_type
+		print self.pars
